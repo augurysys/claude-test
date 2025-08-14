@@ -1,0 +1,4 @@
+auguryapi @ git+https://github.com/augurysys/auguryapi-py.git@0.9.56
+python-sdk-auth @ git+https://github.com/augurysys/python-sdk-auth.git@1.0.4
+py-wrapper-mongo @ git+https://github.com/augurysys/py-wrapper-mongo.git@0.0.2
+py-clients @ git+https://github.com/augurysys/py-clients.git@0.0.2

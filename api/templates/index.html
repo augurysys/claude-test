@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenAI Tester</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js" integrity="sha512-5g2Nj3mqLOgClHi20oat1COW7jWvf7SyqnvwWUsMDwhjHeqeTl0C+uzjucLweruQxHbhDwiPLXlm8HBO0011pA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <div id="app-wrapper">
+        <h1>GenAI Tester</h1>
+
+        <div class="container">
+            <textarea id="question-input" rows="6" placeholder="Enter the book theme..."></textarea>
+            <button id="ask-button">Recommend Books</button>
+
+            <div id="loading" style="display: none;">
+                <p>Finding books...</p>
+            </div>
+
+            <h2>Answer:</h2>
+            <div id="response-output" class="markdown-body">
+                </div>
+        </div>
+    </div><script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{{- if .Values.async.enabled }}
+{{- if .Values.metrics.enabled }}
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "microservice-genai-template.fullname" . }}-async
+  labels:
+    app: {{ template "microservice-genai-template.name" . }}-async
+    chart: {{ template "microservice-genai-template.chart" . }}
+    release: prometheus-operator
+    heritage: {{ .Release.Service }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "microservice-genai-template.name" . }}-async
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  endpoints:
+    - port: metrics
+  namespaceSelector:
+    matchNames:
+    - default
+{{- end }}
+{{- end }}

@@ -1,0 +1,32 @@
+image:
+  registry: augury.azurecr.io
+  tag:
+  pullPolicy: IfNotPresent
+envVars:
+  azureDeployment: gpt-4o
+  openaiModelVersion: 2023-03-15-preview
+  langchainTracing: "false"
+api:
+  replicaCount: 0
+  resources:
+    limits:
+      cpu: 110m
+      memory: 275Mi
+    requests:
+      cpu: 100m
+      memory: 250Mi
+tolerations:
+- key: kubernetes.azure.com/scalesetpriority
+  operator: Equal
+  value: spot
+  effect: NoSchedule
+
+async:
+  replicaCount: 0
+  resources:
+    limits:
+      cpu: 110m
+      memory: 375Mi
+    requests:
+      cpu: 100m
+      memory: 350Mi

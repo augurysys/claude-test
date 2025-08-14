@@ -1,0 +1,107 @@
+{{- $secretMountPath := "/etc/gcloud/service-account.json" -}}
+{{- if .Values.async.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "microservice-genai-template.name" . }}-async
+  labels:
+    app.kubernetes.io/name: {{ include "microservice-genai-template.name" . }}-async
+{{ include "microservice-genai-template.labels" . | indent 4 }}
+  annotations:
+    configmap.reloader.stakater.com/reload: "augury-common-nsq,augury-common-services,augury-common-mongodb,augury-common-fst,augury-common-scylla,augury-common-aimodels"
+    secret.reloader.stakater.com/reload: "augury-common-mongodb,augury-common-fst,augury-common-scylla,augury-common-aimodels,augury-common-datastax,datastax-secure-bundle"
+spec:
+  replicas: {{ .Values.async.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "microservice-genai-template.name" . }}-async
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "microservice-genai-template.name" . }}-async
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      volumes:
+        - name: "datastax-secure-bundle"
+          secret:
+            secretName: "datastax-secure-bundle"
+            optional: true
+      {{- if .Values.serviceAccount.enabled }}
+        - name: "{{ .Values.serviceAccount.name }}"
+          secret:
+            secretName: "{{ .Values.serviceAccount.name }}"
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.registry }}/microservice-genai-template:{{ .Values.image.tag }}"
+          args: ["async"]
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - name: "datastax-secure-bundle"
+              readOnly: true
+              mountPath: "/src/datastax-secure-bundle.zip"
+              subPath: datastax-secure-bundle
+          {{- if .Values.serviceAccount.enabled }}
+            - name: "{{ .Values.serviceAccount.name }}"
+              readOnly: true
+              mountPath: {{ $secretMountPath }}
+              subPath: service-account.json
+          {{- end }}
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: {{ $secretMountPath }}
+            - name: DATASTAX_SECURE_BUNDLE_PATH
+              value: "/src/datastax-secure-bundle.zip"
+          envFrom:
+            - configMapRef:
+                name: {{ .Chart.Name }}
+            - secretRef:
+                name: {{ .Chart.Name }}-async
+            # bring common environment variables
+            - configMapRef:
+                name: augury-common-services
+            # bring nsq environment variables
+            - configMapRef:
+                name: augury-common-nsq
+            # add here if you need redis / scylla / mongodb. dont forget to add it in anotations reloader!
+            - configMapRef:
+                name: augury-common-mongodb
+            - secretRef:
+                name: augury-common-mongodb
+            - configMapRef:
+                name: augury-common-fst
+            - secretRef:
+                name: augury-common-fst
+            - configMapRef:
+                name: augury-common-scylla
+            - secretRef:
+                name: augury-common-scylla
+            - configMapRef:
+                name: augury-common-aimodels
+            - secretRef:
+                name: augury-common-aimodels
+            - secretRef:
+                name: augury-common-datastax
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+            - name: metrics
+              containerPort: 9020
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.async.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+{{- end }}
