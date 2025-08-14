@@ -1,0 +1,11 @@
+{
+  "repository": "claude-test",
+  "status": "active",
+  "created_at": "2025-08-14T23:36:27.768788",
+  "features": [
+    "Automated file creation",
+    "GitHub CLI integration",
+    "Pull request automation",
+    "Issue management"
+  ]
+}
